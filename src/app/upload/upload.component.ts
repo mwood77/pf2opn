@@ -39,6 +39,10 @@ export class UploadComponent implements OnInit, OnDestroy {
     }
   }
 
+  download(event: any) {
+
+  }
+
   async onFileSelected(event: any) {
     const file: File = event.target.files[0];
     this.fileName = file.name;
@@ -48,9 +52,9 @@ export class UploadComponent implements OnInit, OnDestroy {
 
       this.converterService.convert(this.fileName, file)
       .then((result) => {
-        console.log(result);
         this.progressMode = 'determinate';
         this.incrementProgress();
+        console.log(result);
       })
       .catch((e) => {
         console.error('something went boom: ' + e);
@@ -72,7 +76,7 @@ export class UploadComponent implements OnInit, OnDestroy {
       this.displayConversionCard = e;
     })
     this.converterService.conversionAvailable$.subscribe((e) => {
-      this.displayConversionCard = e;
+      this.conversionAvailable = e;
     })
   }
 

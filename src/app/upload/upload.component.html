@@ -37,7 +37,7 @@
         </mat-card-header>
     </mat-card>
 
-    <mat-card class="mat-elevation-z1 caution-card" *ngIf="fileName">
+    <mat-card class="mat-elevation-z1 caution-card" *ngIf="fileName && !this.unsupportedFile">
         <mat-card-header>
             <mat-card-content>
                 <div class='caution-content bold'>
@@ -54,13 +54,12 @@
         </mat-card-header>
     </mat-card>
 
-    <mat-card class="mat-elevation-z1" *ngIf="this.fileName">
+    <mat-card class="mat-elevation-z1" *ngIf="this.fileName && !this.unsupportedFile">
 
         <mat-card-header>
             <mat-card-title class="text">Opnsense Conversion</mat-card-title>
-          </mat-card-header>
+        </mat-card-header>
 
-        <!-- <div class="center"> -->
         <mat-card-content>
             <div class="spacer"></div>
 
@@ -73,7 +72,15 @@
                 </mat-progress-bar>
             </div>
 
-        <!-- </div> -->
+
+            <div class="spacer"></div>
+
+            <div class="center" *ngIf="this.conversionAvailable">
+                <button mat-raised-button color="primary" class="convert-button" (click)="download($event)">
+                    <div class="convert-button-text">Download</div>
+                </button>
+            </div>
+
         </mat-card-content>
     </mat-card>
 
