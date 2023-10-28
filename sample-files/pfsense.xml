@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<pfsense>
+  <version>2.5.1</version>
+  <lastchange>Wed Oct 26 14:30:15 UTC 2023</lastchange>
+  <system>
+    <hostname>my-pfsense-firewall</hostname>
+    <domain>localdomain</domain>
+    <timezone>UTC</timezone>
+    <language>English</language>
+  </system>
+  <interfaces>
+    <lan>
+      <if>em0</if>
+      <descr>LAN</descr>
+      <ipaddr>192.168.1.1</ipaddr>
+      <subnet>24</subnet>
+      <gateway>none</gateway>
+      <isdhcp>false</isdhcp>
+    </lan>
+    <wan>
+      <if>em1</if>
+      <descr>WAN</descr>
+      <ipaddr>203.0.113.1</ipaddr>
+      <subnet>30</subnet>
+      <gateway>203.0.113.2</gateway>
+      <isdhcp>false</isdhcp>
+    </wan>
+  </interfaces>
+  <nat>
+    <outbound>
+      <mode>automatic</mode>
+    </outbound>
+  </nat>
+  <firewall>
+    <rule>
+      <if>WAN</if>
+      <descr>Allow SSH Inbound</descr>
+      <proto>tcp</proto>
+      <src>any</src>
+      <dst>203.0.113.1</dst>
+      <dstport>22</dstport>
+    </rule>
+  </firewall>
+</pfsense>

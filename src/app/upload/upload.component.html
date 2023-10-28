@@ -1,0 +1,87 @@
+<p>upload works!</p>
+<div class="contianer">
+
+    <mat-card class="mat-elevation-z1">
+        <mat-card-header>
+            <mat-card-title class="text">Upload</mat-card-title>
+            <mat-card-subtitle>Select your pfSense config file</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content class="text">
+            <input type="file" class="file-input"
+                (change)="onFileSelected($event)" #fileUpload>
+            <div class="center">
+                <button mat-raised-button color="accent" class="upload-button" (click)="fileUpload.click()" [disabled]="this.convertFinished">
+                    <div class="upload-button-text">{{ fileName || "upload" }}</div>
+                </button>
+
+                <div class="horizontal-spacer"></div>
+
+                <button mat-stroked-button color="warn" class="cancel-button" (click)="reset($event)">
+                    <div class="cancel-button-text">Cancel</div>
+                </button>
+            </div>
+          </mat-card-content>
+    </mat-card>
+
+    <mat-card class="mat-elevation-z1 unsupported-card" *ngIf="this.unsupportedFile">
+        <mat-card-header>
+            <mat-card-content>
+                <div class='unsupported-content bold'>
+                    <p class="center">
+                        You have selected an unsupported file type. Please select a pfSense config file (XML).
+                    </p>
+                </div>
+            </mat-card-content>
+        </mat-card-header>
+    </mat-card>
+
+    <mat-card class="mat-elevation-z1 caution-card" *ngIf="this.convertFinished">
+        <mat-card-header>
+            <mat-card-content>
+                <div class='caution-content bold'>
+                    <p><i>Test this configuration in a development environment before deploying to mission critical services!</i></p>
+                </div>
+                <div class='caution-content'>
+                    <p>
+                        There is no warranty, expressed or implied, associated with this tool.
+                        There is no liability for any damage, physical or otherwise, caused by this product.
+                    </p>
+                    <p>Only you are responsible for your own actions.</p>
+                </div>
+            </mat-card-content>
+        </mat-card-header>
+    </mat-card>
+
+    <mat-card class="mat-elevation-z1" *ngIf="convertFinished">
+
+        <mat-card-header>
+            <mat-card-title class="text">Opnsense Covnersion</mat-card-title>
+          </mat-card-header>
+
+        <!-- <div class="center"> -->
+        <mat-card-content>
+            <div class="spacer"></div>
+            <div *ngIf="this.progressMode == 'indeterminate'; else conversionComplete">
+                <mat-card-subtitle class="text">working...</mat-card-subtitle>
+                <div class="status-text justify-content-end">
+                    <mat-progress-bar
+                        class="example-margin"
+                        color="accent"
+                        [mode]="this.progressMode"
+                        value="100">
+                    </mat-progress-bar>
+                </div>
+                <div class="spacer"></div>
+            </div>
+
+            <ng-template #conversionComplete>
+                <mat-card-subtitle class="text">Converting to opnsense compatible xml...</mat-card-subtitle>
+                <div class="spacer"></div>
+            </ng-template>
+
+        <!-- </div> -->
+        </mat-card-content>
+    </mat-card>
+
+</div>

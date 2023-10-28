@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<opnsense>
+    <version>22.1</version>
+    <config-apply>
+        <uuid>12345678-1234-1234-1234-1234567890ab</uuid>
+    </config-apply>
+    <system>
+        <hostname>my-opnsense-firewall</hostname>
+        <domain>localdomain</domain>
+        <timezone>Pacific/Honolulu</timezone>
+        <language>English</language>
+    </system>
+    <interfaces>
+        <lan>
+            <enable>1</enable>
+            <ipaddr>192.168.1.1</ipaddr>
+            <subnet>24</subnet>
+            <descr>LAN interface</descr>
+        </lan>
+        <wan>
+            <enable>1</enable>
+            <ipaddr>203.0.113.1</ipaddr>
+            <subnet>30</subnet>
+            <gateway>203.0.113.2</gateway>
+            <descr>WAN interface</descr>
+        </wan>
+    </interfaces>
+    <firewall>
+        <rules>
+            <rule>
+                <uuid>12345678-1234-1234-1234-1234567890cd</uuid>
+                <type>pass</type>
+                <enabled>1</enabled>
+                <interface>wan</interface>
+                <descr>Allow SSH Inbound</descr>
+                <protocol>tcp</protocol>
+                <source>
+                    <any>1</any>
+                </source>
+                <destination>
+                    <address>203.0.113.1</address>
+                    <port>22</port>
+                </destination>
+            </rule>
+        </rules>
+    </firewall>
+</opnsense>

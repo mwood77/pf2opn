@@ -1,0 +1,102 @@
+.contianer {
+    margin-top: 1.5rem;
+}
+
+mat-card {
+    margin: 1rem;
+}
+
+.full-screen-spacer {
+    flex: 1 1 auto;
+}
+
+
+.progress-bar {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  height: 60px;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.horizontal-spacer {
+    width: 5rem;
+}
+
+.upload-card {
+    margin-top: 1rem;
+    margin-bottom: 0.6rem;
+    margin-left: 1rem;
+}
+
+.text {
+    color: whitesmoke;
+}
+
+.upload-button {
+    height: 3rem;
+    width: 50%;
+    
+    .upload-button-text {
+        font-size: 1rem;
+        // margin-top: 0.6rem;
+        // margin-bottom: 0.6rem;
+    }
+}
+
+.cancel-button {
+    height: 3rem;
+    width: 10%;
+    
+    .cancel-button-text {
+        font-size: 1rem;
+        // margin-top: 0.6rem;
+        // margin-bottom: 0.6rem;
+    }
+}
+
+.file-input {
+    display: none;
+}
+
+
+.caution-card {
+    color: #1c1e21;
+    background-color: #ffba00;
+
+    .mat-card-subtitle {
+        color: #1c1e21;
+    }
+
+    .caution-content {
+        padding: 1vh 0;
+    }
+
+    .bold {
+        font-size: 15px;
+        font-weight: 800;
+    }
+}
+
+.unsupported-card {
+    color: whitesmoke;
+    background-color: #ff4d00;
+
+    .mat-card-subtitle {
+        color: whitesmoke;
+    }
+
+    .unsupported-content {
+        padding: 1vh 0;
+    }
+
+    .unsupported {
+        font-size: 15px;
+        font-weight: 800;
+    }
+}

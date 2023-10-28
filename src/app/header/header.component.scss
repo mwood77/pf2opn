@@ -1,0 +1,36 @@
+@use '@angular/material' as mat;
+
+.toolbar {
+    @include mat.elevation(6);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+}
+
+.toolbar-spacer {
+    flex: 1 1 auto;
+  }
+
+.secondary-toolbar {
+    @include mat.elevation(2);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    column-gap: 17px;
+    -webkit-transform: translateY(100%); //if your div is 200px, this will move it down by 200px, if it is 100px it will down by 100px etc
+    transform: translateY(100%);         //if your div is 200px, this will move it down by 200px, if it is 100px it will down by 100px etc
+    margin-top: -10px;
+    z-index: 3;
+
+    .mat-toolbar-row, .menu-button {
+        padding-top: 15px;
+    }
+
+}
+
+.apps {
+    @include mat.elevation(0);
+}
