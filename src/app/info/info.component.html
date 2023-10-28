@@ -1,0 +1,40 @@
+<div class="container">
+    <mat-card class="mat-elevation-z1">
+        <mat-card-header>
+            <mat-card-title class="text">Why does this exist?</mat-card-title>
+            <mat-card-subtitle>pfsense -> opnsense is not a straighforward conversion</mat-card-subtitle>
+          </mat-card-header>
+    
+          <mat-card-content class="text">
+            <div class="text">
+                There have been some rumblings in the homelab (and enterprise) community about the lack of a migration path from pfSense to Opnsense. 
+            </div>
+            <div class="text">
+                This tool is an attempt to provide a solution to that problem.
+                This tool does not guarantee a perfect conversion. It is a best effort attempt to convert your pfSense configuration to Opnsense.
+            </div>
+          </mat-card-content>
+
+          <div class="spacer"></div>
+
+          <hr>
+
+          <mat-card-header>
+            <mat-card-title class="text">Consider Donating</mat-card-title>
+            <mat-card-subtitle class="text">Donations help with development and hosting costs</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="text">
+            <div class="center">
+                <a target="_blank" mat-raised-button color="accent" (click)="openSite(githubURL)">
+                    GitHub Sponsor
+                </a>
+                
+                <p class="horizontal-spacer"></p>
+                
+                <a target="_blank" mat-raised-button color="accent"(click)="openSite(kofiURL)">
+                    ko-fi
+                </a>
+            </div>
+          </mat-card-content>
+    </mat-card>
+</div>

@@ -21,12 +21,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UploadComponent } from './upload/upload.component';
+import { InfoComponent } from './info/info.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-    UploadComponent
+    UploadComponent,
+    InfoComponent
   ],
   imports: [
     BrowserModule,

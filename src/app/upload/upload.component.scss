@@ -10,6 +10,9 @@ mat-card {
     flex: 1 1 auto;
 }
 
+.text {
+    color: whitesmoke;
+}
 
 .progress-bar {
   display: flex;
@@ -25,17 +28,13 @@ mat-card {
 }
 
 .horizontal-spacer {
-    width: 5rem;
+    width: 2rem;
 }
 
 .upload-card {
     margin-top: 1rem;
     margin-bottom: 0.6rem;
     margin-left: 1rem;
-}
-
-.text {
-    color: whitesmoke;
 }
 
 .upload-button {

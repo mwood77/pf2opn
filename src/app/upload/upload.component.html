@@ -1,5 +1,6 @@
-<p>upload works!</p>
 <div class="contianer">
+
+    <app-info></app-info>
 
     <mat-card class="mat-elevation-z1">
         <mat-card-header>
@@ -11,7 +12,7 @@
             <input type="file" class="file-input"
                 (change)="onFileSelected($event)" #fileUpload>
             <div class="center">
-                <button mat-raised-button color="accent" class="upload-button" (click)="fileUpload.click()" [disabled]="this.convertFinished">
+                <button mat-raised-button color="primary" class="upload-button" (click)="fileUpload.click()" [disabled]="this.convertFinished">
                     <div class="upload-button-text">{{ fileName || "upload" }}</div>
                 </button>
 
