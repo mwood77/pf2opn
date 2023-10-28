@@ -50,19 +50,26 @@ export class UploadComponent implements OnInit, OnDestroy {
     if (file && file.type.match('text/xml')) {
       this.unsupportedFile = false;
 
-      this.converterService.convert(this.fileName, file)
-      .then((result) => {
+      (await this.converterService.convert(file)).subscribe((e: any) => {
+        console.log(e);
         this.progressMode = 'determinate';
         this.incrementProgress();
-        console.log(result);
-      })
-      .catch((e) => {
-        console.error('something went boom: ' + e);
       })
 
-      const formData = new FormData();
-
-      formData.append("thumbnail", file);
+      // if (result) {
+      //   this.progressMode = 'determinate';
+      //   this.incrementProgress();
+      // } else (e: string) => {
+      //   console.error('something went boom: ' + e);
+      // }
+      // .then((result) => {
+      //   console.log(result);
+      //   this.progressMode = 'determinate';
+      //   this.incrementProgress();
+      // })
+      // .catch((e) => {
+      //   console.error('something went boom: ' + e);
+      // })
 
     } else {
       this.unsupportedFile = true;
