@@ -66,7 +66,7 @@
             <div class="status-text justify-content-end">
                 <mat-progress-bar
                     class="example-margin"
-                    color="accent"
+                    [color]="this.progressColor"
                     [mode]="this.progressMode"
                     [value]="this.progressValue">
                 </mat-progress-bar>
@@ -75,10 +75,31 @@
 
             <div class="spacer"></div>
 
-            <div class="center" *ngIf="this.conversionAvailable">
-                <button mat-raised-button color="primary" class="convert-button" (click)="download($event)">
-                    <div class="convert-button-text">Download</div>
-                </button>
+            <!-- Everything worked out! -->
+            <div *ngIf="this.conversionAvailable && !this.conversionError">
+                <div class="center">
+
+                    <button mat-stroked-button color="accent" class="convert-button" (click)="download()">
+                        <div class="convert-button-text">Download Generated Config</div>
+                    </button>
+                </div>
+
+<!-- purposeful indent location -->
+<pre>
+<?xml version="1.0"?>
+{{ this.renderedXML }}
+</pre>
+            </div>
+
+            <!-- Something blew up! -->
+            <div *ngIf="this.conversionError">
+                <div class="center">
+                    <p class="text"><strong>Are you sure you uploaded a pfSense config file?</strong></p>
+                </div>
+<!-- purposeful indent location -->
+<pre class="error-code">
+{{ this.renderedXML }}
+</pre>
             </div>
 
         </mat-card-content>

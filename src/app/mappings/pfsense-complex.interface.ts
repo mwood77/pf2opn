@@ -1,5 +1,4 @@
 interface RootObject {
-  '?xml': string;
   pfsense: Pfsense;
 }
 

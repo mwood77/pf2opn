@@ -1,5 +1,4 @@
 export interface pfRoot {
-  '?xml': string;
   pfsense: Pfsense;
 }
 

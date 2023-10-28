@@ -1,5 +1,4 @@
 export interface opnRoot {
-  '?xml': string;
   opnsense: Opnsense;
 }
 

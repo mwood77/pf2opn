@@ -6,6 +6,23 @@ mat-card {
     margin: 1rem;
 }
 
+pre { 
+    overflow-x: auto; 
+    tab-size: 4; 
+    background: black;
+    color: white;
+    padding: 20px;
+}
+
+form * {
+    display: block;
+    margin: 10px;
+}
+
+.error-code { 
+    color: red;
+}
+
 .full-screen-spacer {
     flex: 1 1 auto;
 }
