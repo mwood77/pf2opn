@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ProgressBarMode } from '@angular/material/progress-bar';
-import { ConverterService } from '../converter.service';
+import { ConverterService } from '../services/converter.service';
 
 @Component({
   selector: 'app-upload',

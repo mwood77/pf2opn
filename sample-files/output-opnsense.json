@@ -1,0 +1,49 @@
+{
+  "?xml": "",
+  "opnsense": {
+    "version": 22.1,
+    "config-apply": {
+      "uuid": "12345678-1234-1234-1234-1234567890ab"
+    },
+    "system": {
+      "hostname": "my-opnsense-firewall",
+      "domain": "localdomain",
+      "timezone": "Pacific/Honolulu",
+      "language": "English"
+    },
+    "interfaces": {
+      "lan": {
+        "enable": 1,
+        "ipaddr": "192.168.1.1",
+        "subnet": 24,
+        "descr": "LAN interface"
+      },
+      "wan": {
+        "enable": 1,
+        "ipaddr": "203.0.113.1",
+        "subnet": 30,
+        "gateway": "203.0.113.2",
+        "descr": "WAN interface"
+      }
+    },
+    "firewall": {
+      "rules": {
+        "rule": {
+          "uuid": "12345678-1234-1234-1234-1234567890cd",
+          "type": "pass",
+          "enabled": 1,
+          "interface": "wan",
+          "descr": "Allow SSH Inbound",
+          "protocol": "tcp",
+          "source": {
+            "any": 1
+          },
+          "destination": {
+            "address": "203.0.113.1",
+            "port": 22
+          }
+        }
+      }
+    }
+  }
+}

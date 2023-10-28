@@ -1,0 +1,46 @@
+{
+  "?xml": "",
+  "pfsense": {
+    "version": "2.5.1",
+    "lastchange": "Wed Oct 26 14:30:15 UTC 2023",
+    "system": {
+      "hostname": "my-pfsense-firewall",
+      "domain": "localdomain",
+      "timezone": "UTC",
+      "language": "English"
+    },
+    "interfaces": {
+      "lan": {
+        "if": "em0",
+        "descr": "LAN",
+        "ipaddr": "192.168.1.1",
+        "subnet": 24,
+        "gateway": "none",
+        "isdhcp": false
+      },
+      "wan": {
+        "if": "em1",
+        "descr": "WAN",
+        "ipaddr": "203.0.113.1",
+        "subnet": 30,
+        "gateway": "203.0.113.2",
+        "isdhcp": false
+      }
+    },
+    "nat": {
+      "outbound": {
+        "mode": "automatic"
+      }
+    },
+    "firewall": {
+      "rule": {
+        "if": "WAN",
+        "descr": "Allow SSH Inbound",
+        "proto": "tcp",
+        "src": "any",
+        "dst": "203.0.113.1",
+        "dstport": 22
+      }
+    }
+  }
+}

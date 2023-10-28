@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" *ngIf="showInfoCard">
     <mat-card class="mat-elevation-z1">
         <mat-card-header>
             <mat-card-title class="text">Why does this exist?</mat-card-title>
@@ -17,24 +17,27 @@
 
           <div class="spacer"></div>
 
-          <hr>
+          
+          <div *ngif="showDonations">
+            <hr>
+            <mat-card-header>
+              <mat-card-title class="text">Consider Donating</mat-card-title>
+              <mat-card-subtitle class="text">Donations help with development and hosting costs</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="text">
+              <div class="center">
+                  <a target="_blank" mat-raised-button color="accent" (click)="openSite(githubURL)">
+                      GitHub Sponsor
+                  </a>
+                  
+                  <p class="horizontal-spacer"></p>
+                  
+                  <a target="_blank" mat-raised-button color="accent"(click)="openSite(kofiURL)">
+                      ko-fi
+                  </a>
+              </div>
+            </mat-card-content>
+          </div>
 
-          <mat-card-header>
-            <mat-card-title class="text">Consider Donating</mat-card-title>
-            <mat-card-subtitle class="text">Donations help with development and hosting costs</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content class="text">
-            <div class="center">
-                <a target="_blank" mat-raised-button color="accent" (click)="openSite(githubURL)">
-                    GitHub Sponsor
-                </a>
-                
-                <p class="horizontal-spacer"></p>
-                
-                <a target="_blank" mat-raised-button color="accent"(click)="openSite(kofiURL)">
-                    ko-fi
-                </a>
-            </div>
-          </mat-card-content>
     </mat-card>
 </div>
