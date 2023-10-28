@@ -12,14 +12,14 @@
             <input type="file" class="file-input"
                 (change)="onFileSelected($event)" #fileUpload>
             <div class="center">
-                <button mat-raised-button color="primary" class="upload-button" (click)="fileUpload.click()" [disabled]="this.convertFinished">
-                    <div class="upload-button-text">{{ fileName || "upload" }}</div>
+                <button mat-raised-button color="primary" class="upload-button" (click)="fileUpload.click()" [disabled]="this.displayConversionCard">
+                    <div class="upload-button-text">{{ fileName || "Upload" }}</div>
                 </button>
 
                 <div class="horizontal-spacer"></div>
 
                 <button mat-stroked-button color="warn" class="cancel-button" (click)="reset($event)">
-                    <div class="cancel-button-text">Cancel</div>
+                    <div class="cancel-button-text">Reset</div>
                 </button>
             </div>
           </mat-card-content>
@@ -37,7 +37,7 @@
         </mat-card-header>
     </mat-card>
 
-    <mat-card class="mat-elevation-z1 caution-card" *ngIf="this.convertFinished">
+    <mat-card class="mat-elevation-z1 caution-card" *ngIf="fileName">
         <mat-card-header>
             <mat-card-content>
                 <div class='caution-content bold'>
@@ -54,32 +54,24 @@
         </mat-card-header>
     </mat-card>
 
-    <mat-card class="mat-elevation-z1" *ngIf="convertFinished">
+    <mat-card class="mat-elevation-z1" *ngIf="this.fileName">
 
         <mat-card-header>
-            <mat-card-title class="text">Opnsense Covnersion</mat-card-title>
+            <mat-card-title class="text">Opnsense Conversion</mat-card-title>
           </mat-card-header>
 
         <!-- <div class="center"> -->
         <mat-card-content>
             <div class="spacer"></div>
-            <div *ngIf="this.progressMode == 'indeterminate'; else conversionComplete">
-                <mat-card-subtitle class="text">working...</mat-card-subtitle>
-                <div class="status-text justify-content-end">
-                    <mat-progress-bar
-                        class="example-margin"
-                        color="accent"
-                        [mode]="this.progressMode"
-                        value="100">
-                    </mat-progress-bar>
-                </div>
-                <div class="spacer"></div>
-            </div>
 
-            <ng-template #conversionComplete>
-                <mat-card-subtitle class="text">Converting to opnsense compatible xml...</mat-card-subtitle>
-                <div class="spacer"></div>
-            </ng-template>
+            <div class="status-text justify-content-end">
+                <mat-progress-bar
+                    class="example-margin"
+                    color="accent"
+                    [mode]="this.progressMode"
+                    [value]="this.progressValue">
+                </mat-progress-bar>
+            </div>
 
         <!-- </div> -->
         </mat-card-content>

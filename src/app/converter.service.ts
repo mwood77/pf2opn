@@ -6,21 +6,26 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ConverterService {
 
-  convertFinished$ = new BehaviorSubject(false);
+  displayConversionCard$ = new BehaviorSubject(false);
+  conversionAvailable$ = new BehaviorSubject(false);
 
   constructor() { }
 
   cancel() {
-    this.convertFinished$.next(false);
+    this.displayConversionCard$.next(false);
   }
 
-  convert() {
-    this.convertFinished$.next(false);
-    this.convertFinished$.next(true);
+  async convert(fileName: string, file: File) {
+    this.displayConversionCard$.next(false);
+    this.displayConversionCard$.next(true);
+    
+    this.conversionAvailable$.next(false);
 
-    setTimeout(() => {
-      this.convertFinished$.next(true);
-      console.log('done');
-    }, 5000);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        this.conversionAvailable$.next(true);
+        resolve('done');
+      }, 5000);
+    })
   }
 }
