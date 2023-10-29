@@ -12,7 +12,7 @@ export interface Pfsense {
 }
 
 export interface Firewall {
-  rule: Rule;
+  rule: Rule[];
 }
 
 export interface Rule {
@@ -34,8 +34,8 @@ export interface Outbound {
 }
 
 export interface Interfaces {
-  lan: Lan;
-  wan: Wan;
+  lan: Lan[];
+  wan: Wan[];
 }
 
 export interface Lan {

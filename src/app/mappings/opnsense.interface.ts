@@ -11,12 +11,12 @@ export interface Opnsense {
 }
 
 export interface Firewall {
-  rules: Rules;
+  rules: Rule[];
 }
 
-export interface Rules {
-  rule: Rule;
-}
+// export interface Rules {
+//   rule: Rule[];
+// }
 
 export interface Rule {
   uuid: string;
@@ -39,8 +39,8 @@ export interface Source {
 }
 
 export interface Interfaces {
-  lan: Lan;
-  wan: Wan;
+  lan: Lan[];
+  wan: Wan[];
 }
 
 export interface Wan {
