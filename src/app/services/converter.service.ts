@@ -3,8 +3,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { 
   pfRoot, 
   Rule as pfRule, 
-  Wan as pfWan, 
-  Lan as pfLan 
+  NetworkController as pfWan, 
+  NetworkController as pfLan,
+  NetworkController as pfOpt,
+  Lan2 as pfLan2,
 } from '../mappings/pfsense-complex.interface';
 import { 
   opnRoot,
@@ -12,9 +14,12 @@ import {
   Firewall as opnFirewall, 
   Rule as opnRule, 
   Opnsense, 
-  Wan as opnWan, 
-  Lan as opnLan, 
-  System as opnSystem 
+  NetworkController as opnWan, 
+  NetworkController as opnLan, 
+  NetworkController as opnOpt, 
+  System as opnSystem,
+  Dhcpd as opnDhcpd,
+  Lan2 as opnLan2,
 } from '../mappings/opnsense.interface';
 import { v1 as uuidv1 } from 'uuid'
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
@@ -61,7 +66,7 @@ export class ConverterService {
         }
         const opnXml = that.jsonToXML(opnJson as opnRoot);
 
-        const prettiedXml = that.formatXml(opnXml, '  ');
+        const prettiedXml = that.formatXml(opnXml);
         
         subscriber.next(prettiedXml);  // opnXml object will be returned to the calling method
         subscriber.complete();    // Complete the subscriber
@@ -76,7 +81,10 @@ export class ConverterService {
     const pfSystem = input.pfsense.system;
     const wans: opnWan[] = [];
     const lans: opnLan[] = [];
+    const opts: opnOpt[] = [];
     const rules: opnRule[] = [];
+    const dhcpds: opnLan2[] = [];
+
     const system: opnSystem = {
       hostname: '',
       domain: '',
@@ -88,48 +96,34 @@ export class ConverterService {
     if (pfInterfacesIter) {
 
       for (const [key, value] of Object.entries(pfInterfacesIter)) {
-        
         if (key === 'wan') {
-          if (value instanceof Array) {
-            value.forEach((wan: pfWan) => {
-              wans.push({
-                enable: wan.enable == null ? 0 : +wan.enable,
-                ipaddr: wan.ipaddr as string,
-                subnet: wan['alias-subnet'] == null ? 0 : +wan['alias-subnet'],
-                gateway: wan['alias-address'] == null ? '' : wan['alias-address'],
-                descr: wan.descr as string,
-              });
+          wans.push({
+            ...value
           });
-          } else {
-            wans.push({
-              enable: value.enable == null ? 0 : +value.enable,
-              ipaddr: value.ipaddr as string,
-              subnet: value['alias-subnet'] == null ? 0 : +value['alias-subnet'],
-              gateway: value['alias-address'] == null ? '' : value['alias-address'],
-              descr: value.descr as string,
-            });
-          }
         };
 
         if (key === 'lan') {
-          if (value instanceof Array) {
-            value.forEach((lan: pfLan) => {
-              lans.push({
-                enable: lan.enable == null ? 0 : +lan.enable,
-                ipaddr: lan.ipaddr as string,
-                subnet: lan.subnet as number,
-                descr: lan.descr as string,
-              });
-            })
-          } else {
-            lans.push({
-              enable: value.enable == null ? 0 : +value.enable,
-              ipaddr: value.ipaddr as string,
-              subnet: value.subnet as number,
-              descr: value.descr as string,
-            });
-          }
+          lans.push({
+            ...value
+          });
         }
+
+        if (key.includes('opt')) {
+          // @todo - fix opt numbering
+          opts.push({
+            ...value
+          });
+        }
+      }
+    }
+
+    const pfDhcpdIter = input.pfsense.dhcpd;
+    if (pfDhcpdIter) {
+      for (const [key, value] of Object.entries(pfDhcpdIter)) {
+        // @todo - fix tag naming
+        dhcpds.push({
+          ...value
+        });
       }
     }
 
@@ -150,9 +144,10 @@ export class ConverterService {
                   any: rule.src === 'any' ? 1 : 0,
                 },
                 destination: {
-                  address: rule.dst as string,
-                  port: rule.dstport as number,
+                  address: rule.dst,
+                  port: rule.dstport,
                 },
+                ...rule
               });
             });
           } else {
@@ -177,19 +172,23 @@ export class ConverterService {
     }
 
     if (pfSystem) {
-      system.hostname = pfSystem.hostname as string;
-      system.domain = pfSystem.domain as string;
-      system.timezone = pfSystem.timezone as string;
-      system.language = pfSystem.language as string;
+      system.hostname = pfSystem.hostname;
+      system.domain = pfSystem.domain;
+      system.timezone = pfSystem.timezone;
     }
 
     const firewall: opnFirewall = {
-      rules
+      rules: (rules.length > 0) ? rules : [],
     };
 
     const interfaces: opnInterfaces = {
       wan: (wans.length > 0) ? wans : [],
       lan: (lans.length > 0) ? lans : [],
+      opt: (opts.length > 0) ? opts : [],
+    };
+
+    const dhcpd: opnDhcpd = {
+      dhcpd: (dhcpds.length > 0) ? dhcpds : [],
     };
 
     const opnsense: Opnsense = {
@@ -199,7 +198,8 @@ export class ConverterService {
       },
       system,
       interfaces,
-      firewall,  
+      dhcpd,
+      firewall,
     }
     
     const opnsenseJson: opnRoot = {
@@ -214,16 +214,16 @@ export class ConverterService {
     return builder.build(opnJson);
   }
 
-  formatXml(xml: any, tab: string) { // tab = optional indent value, default is tab (\t)
+  formatXml(xml: any, tab?: string) { // tab = optional indent value, default is tab (\t)
     let formatted = '', indent= '';
     tab = tab || '\t';
     xml.split(/>\s*</).forEach(function(node: string) {
-        if (node.match( /^\/\w/ )) indent = indent.substring(tab.length); // decrease indent by one 'tab'
+        if (node.match( /^\/\w/ )) indent = indent.substring(tab?.length || 2); // decrease indent by one 'tab'
         formatted += indent + '<' + node + '>\r\n';
         if (node.match( /^<?\w[^>]*[^\/]$/ )) indent += tab;              // increase indent
     });
     return formatted.substring(1, formatted.length-3);
-}
+  }
 
   private throwIncompatibleFileError(message: string): Error {
     return new Error('Incompatible file type\nMessage:  ' + message);

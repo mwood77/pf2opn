@@ -810,10 +810,11 @@ export interface Updated {
 export interface Destination {
   network?: string;
   port?: number | string;
+  address?: string;
 }
 
 export interface Source {
-  any?: string;
+  any?: string | number | undefined;
 }
 
 export interface Syslog {
@@ -921,16 +922,12 @@ export interface Range {
 }
 
 export interface Interfaces {
-  wan?: Wan[];
-  lan?: Lan[];
-  opt1?: Opt1;
+  wan?: NetworkController[];
+  lan?: NetworkController[];
+  opt?: NetworkController;
 }
 
-export interface Opt1 {
-  descr?: string;
-  if?: string;
-  spoofmac?: string;
-}
+
 
 export interface Lan {
   enable?: string;
@@ -945,7 +942,7 @@ export interface Lan {
   gatewayv6?: string;
 }
 
-export interface Wan {
+export interface NetworkController {
   enable?: string;
   if?: string;
   descr?: string;
@@ -953,6 +950,11 @@ export interface Wan {
   'alias-subnet'?: number;
   spoofmac?: string;
   ipaddr?: string;
+  subnet?: number;
+  gateway?: string;
+  ipaddrv6?: string;
+  subnetv6?: string;
+  gatewayv6?: string;
   dhcphostname?: string;
   dhcprejectfrom?: string;
   adv_dhcp_pt_timeout?: string;
