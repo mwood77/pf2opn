@@ -1,17 +1,19 @@
 <div class="container" *ngIf="showInfoCard">
     <mat-card class="mat-elevation-z1">
         <mat-card-header>
-            <mat-card-title class="text">Why does this exist?</mat-card-title>
-            <mat-card-subtitle>pfsense -> opnsense is not a straighforward conversion</mat-card-subtitle>
+            <mat-card-title class="text">Source Code</mat-card-title>
+            <!-- <mat-card-subtitle>and how does this site work</mat-card-subtitle> -->
           </mat-card-header>
     
           <mat-card-content class="text">
             <div class="text">
-                There have been some rumblings in the homelab community about the lack of a migration path from pfSense to Opnsense. 
+                All code is run locally on your machine. No data is sent to any server. The conversion happens in-machine with JavaScript.
             </div>
             <div class="text">
-                This tool is an attempt to provide a solution to that problem.
-                This tool does not guarantee a perfect conversion. It is a best effort attempt to convert your pfSense configuration to Opnsense.
+                You can view the source code here:
+                 <a target="_blank" href="https://github.com/mwood77/pf2opn">
+                  https://github.com/mwood77/pf2opn
+                </a>
             </div>
           </mat-card-content>
 
