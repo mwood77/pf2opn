@@ -1,7 +1,21 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { pfRoot, Interfaces as pfInterfaces, Rule as pfRule, Wan as pfWan, Lan as pfLan } from '../mappings/pfsense.interface';
-import { opnRoot, Interfaces as opnInterfaces, Firewall as opnFirewall, Rule as opnRule, Opnsense, Wan as opnWan, Lan as opnLan } from '../mappings/opnsense.interface';
+import { 
+  pfRoot, 
+  Rule as pfRule, 
+  Wan as pfWan, 
+  Lan as pfLan 
+} from '../mappings/pfsense-complex.interface';
+import { 
+  opnRoot,
+  Interfaces as opnInterfaces, 
+  Firewall as opnFirewall, 
+  Rule as opnRule, 
+  Opnsense, 
+  Wan as opnWan, 
+  Lan as opnLan, 
+  System as opnSystem 
+} from '../mappings/opnsense.interface';
 import { v1 as uuidv1 } from 'uuid'
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 
@@ -25,7 +39,7 @@ export class ConverterService {
     
     this.conversionAvailable$.next(false);
 
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsText(file);
 
     // bypass scope in FileReader.onload
@@ -57,95 +71,125 @@ export class ConverterService {
 
   mapPFtoOPN(input: pfRoot) {
 
-    if (input.pfsense == null) return new Error('pfsense object is null');
-    if (input.pfsense.interfaces == null) this.throwIncompatibleFileError(new Error('interfaces object is null'));
+    if (input.pfsense == null) return this.throwIncompatibleFileError('pfsense object is null');
     
-    if (input.pfsense.interfaces.wan == null) this.throwIncompatibleFileError(new Error('want object is null'));
+    const pfSystem = input.pfsense.system;
     const wans: opnWan[] = [];
-    const pfWansIter = input.pfsense.interfaces.wan;
-
-
-    if (pfWansIter.length != null) {
-      Array.from(pfWansIter).forEach((wan: pfWan) => {
-        wans.push({
-          enable: wan.enable == null ? 0 : +wan.enable,
-          ipaddr: wan.ipaddr,
-          subnet: wan['alias-subnet'] == null ? 0 : +wan['alias-subnet'],
-          gateway: wan['alias-address'] == null ? '' : wan['alias-address'],
-          descr: wan.descr,
-        });
-      });
-    }
-
-    // const wan: opnWan = {
-    //   enable: input.pfsense?.interfaces.wan.enable == null ? 0 : +input.pfsense.interfaces.wan.enable,
-    //   ipaddr: input.pfsense?.interfaces.wan.ipaddr,
-    //   subnet: input.pfsense?.interfaces.wan['alias-subnet'] == null ? 0 : +input.pfsense.interfaces.wan['alias-subnet'],
-    //   gateway: input.pfsense?.interfaces.wan['alias-address'] == null ? '' : input.pfsense.interfaces.wan['alias-address'],
-    //   descr: input.pfsense?.interfaces.wan.descr,
-    // }
-
-    if (input.pfsense.interfaces.lan == null) this.throwIncompatibleFileError(new Error('lan object is null'));
     const lans: opnLan[] = [];
-    const pfLansIter = input.pfsense.interfaces.lan;
-    if (pfLansIter.length != null) {
-      Array.from(pfLansIter).forEach((lan: pfLan) => {
-        lans.push({
-          enable: lan.enable == null ? 0 : +lan.enable,
-          ipaddr: lan.ipaddr,
-          subnet: lan.subnet,
-          descr: lan.descr,
-        });
-      });
-    }
-    // const lan: opnLan = {
-    //   enable: input.pfsense.interfaces.lan.enable == null ? 0 : +input.pfsense.interfaces.lan.enable,
-    //   ipaddr: input.pfsense.interfaces.lan.ipaddr,
-    //   subnet: input.pfsense.interfaces.lan.subnet,
-    //   descr: input.pfsense.interfaces.lan.descr,
-    // }
-
-    if (input.pfsense.firewall == null) this.throwIncompatibleFileError(new Error('firewall object is null'));
-    if (input.pfsense.firewall?.rule == null) this.throwIncompatibleFileError(new Error('rule object is null'));
     const rules: opnRule[] = [];
-    const pfRuleIter = input.pfsense.firewall?.rule;
-    if (pfRuleIter != null) {
-      Array.from(pfRuleIter).forEach((rule: pfRule) => {
-        rules.push({
-          uuid: uuidv1(),
-          type: 'pass',
-          enabled: 0,
-          interface: 'lan',
-          descr: 'generated-rule-from-pf2opn',
-          protocol: rule.proto,
-          source: {
-            any: rule.src === 'any' ? 1 : 0,
-          },
-          destination: {
-            address: rule.dst,
-            port: rule.dstport,
-          },
-        });
-      });
+    const system: opnSystem = {
+      hostname: '',
+      domain: '',
+      timezone: '',
+      language: ''
+    };
+    
+    const pfInterfacesIter = input.pfsense.interfaces;
+    if (pfInterfacesIter) {
+
+      for (const [key, value] of Object.entries(pfInterfacesIter)) {
+        
+        if (key === 'wan') {
+          if (value instanceof Array) {
+            value.forEach((wan: pfWan) => {
+              wans.push({
+                enable: wan.enable == null ? 0 : +wan.enable,
+                ipaddr: wan.ipaddr as string,
+                subnet: wan['alias-subnet'] == null ? 0 : +wan['alias-subnet'],
+                gateway: wan['alias-address'] == null ? '' : wan['alias-address'],
+                descr: wan.descr as string,
+              });
+          });
+          } else {
+            wans.push({
+              enable: value.enable == null ? 0 : +value.enable,
+              ipaddr: value.ipaddr as string,
+              subnet: value['alias-subnet'] == null ? 0 : +value['alias-subnet'],
+              gateway: value['alias-address'] == null ? '' : value['alias-address'],
+              descr: value.descr as string,
+            });
+          }
+        };
+
+        if (key === 'lan') {
+          if (value instanceof Array) {
+            value.forEach((lan: pfLan) => {
+              lans.push({
+                enable: lan.enable == null ? 0 : +lan.enable,
+                ipaddr: lan.ipaddr as string,
+                subnet: lan.subnet as number,
+                descr: lan.descr as string,
+              });
+            })
+          } else {
+            lans.push({
+              enable: value.enable == null ? 0 : +value.enable,
+              ipaddr: value.ipaddr as string,
+              subnet: value.subnet as number,
+              descr: value.descr as string,
+            });
+          }
+        }
+      }
     }
-    // const rule: opnRule = {
-    //   uuid: uuidv1(),
-    //   type: 'pass',
-    //   enabled: 0,
-    //   interface: 'lan',
-    //   descr: 'generated-rule-from-pf2opn',
-    //   protocol: input.pfsense.firewall?.rule?.proto,
-    //   source: {
-    //     any: input.pfsense.firewall?.rule?.src === 'any' ? 1 : 0,
-    //   },
-    //   destination: {
-    //     address: input.pfsense.firewall?.rule?.dst,
-    //     port: input.pfsense.firewall?.rule?.dstport,
-    //   },
-    // };
+
+    const pfRuleIter = input.pfsense.firewall;
+    if (pfRuleIter) {
+      for (const [key, value] of Object.entries(pfRuleIter)) {
+        if (key === 'rule') {
+          if (value instanceof Array) {
+            value.forEach((rule: pfRule) => {
+              rules.push({
+                uuid: uuidv1(),
+                type: 'pass',
+                enabled: 0,
+                interface: 'lan',
+                descr: 'generated-rule-from-pf2opn',
+                protocol: rule.proto as string,
+                source: {
+                  any: rule.src === 'any' ? 1 : 0,
+                },
+                destination: {
+                  address: rule.dst as string,
+                  port: rule.dstport as number,
+                },
+              });
+            });
+          } else {
+            rules.push({
+              uuid: uuidv1(),
+              type: 'pass',
+              enabled: 0,
+              interface: 'lan',
+              descr: 'generated-rule-from-pf2opn',
+              protocol: value.proto as string,
+              source: {
+                any: value.src === 'any' ? 1 : 0,
+              },
+              destination: {
+                address: value.dst as string,
+                port: value.dstport as number,
+              },
+            });
+          }
+        }
+      }
+    }
+
+    if (pfSystem) {
+      system.hostname = pfSystem.hostname as string;
+      system.domain = pfSystem.domain as string;
+      system.timezone = pfSystem.timezone as string;
+      system.language = pfSystem.language as string;
+    }
 
     const firewall: opnFirewall = {
       rules
+    };
+
+    const interfaces: opnInterfaces = {
+      wan: (wans.length > 0) ? wans : [],
+      lan: (lans.length > 0) ? lans : [],
     };
 
     const opnsense: Opnsense = {
@@ -153,16 +197,8 @@ export class ConverterService {
       'config-apply': {
         uuid: uuidv1(),
       },
-      system: {
-        hostname: input.pfsense.system.hostname,
-        domain: input.pfsense.system.domain,
-        timezone: input.pfsense.system.timezone,
-        language: input.pfsense.system.language,
-      },
-      interfaces: {
-        wan: wans,
-        lan: lans,
-      },
+      system,
+      interfaces,
       firewall,  
     }
     
@@ -179,7 +215,7 @@ export class ConverterService {
   }
 
   formatXml(xml: any, tab: string) { // tab = optional indent value, default is tab (\t)
-    var formatted = '', indent= '';
+    let formatted = '', indent= '';
     tab = tab || '\t';
     xml.split(/>\s*</).forEach(function(node: string) {
         if (node.match( /^\/\w/ )) indent = indent.substring(tab.length); // decrease indent by one 'tab'
@@ -189,7 +225,7 @@ export class ConverterService {
     return formatted.substring(1, formatted.length-3);
 }
 
-  private throwIncompatibleFileError(e: Error) {
-    return new Error('Incompatible file type. Please upload pfsense config file. ' + e);
+  private throwIncompatibleFileError(message: string): Error {
+    return new Error('Incompatible file type\nMessage:  ' + message);
   }
 }
