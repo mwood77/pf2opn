@@ -14,15 +14,47 @@
       <descr>LAN</descr>
       <ipaddr>192.168.1.1</ipaddr>
       <subnet>24</subnet>
-      <gateway>none</gateway>
+      <gateway>203.0.113.2</gateway>
+      <isdhcp>false</isdhcp>
+    </lan>
+    <lan>
+      <if>em1</if>
+      <descr>LAN</descr>
+      <ipaddr>192.168.1.2</ipaddr>
+      <subnet>24</subnet>
+      <gateway>203.0.113.2</gateway>
+      <isdhcp>false</isdhcp>
+    </lan>
+    <lan>
+      <if>em2</if>
+      <descr>LAN</descr>
+      <ipaddr>192.168.1.3</ipaddr>
+      <subnet>24</subnet>
+      <gateway>203.0.113.2</gateway>
       <isdhcp>false</isdhcp>
     </lan>
     <wan>
-      <if>em1</if>
+      <if>em3</if>
       <descr>WAN</descr>
       <ipaddr>203.0.113.1</ipaddr>
       <subnet>30</subnet>
-      <gateway>203.0.113.2</gateway>
+      <gateway>something.co</gateway>
+      <isdhcp>false</isdhcp>
+    </wan>
+    <wan>
+      <if>em4</if>
+      <descr>WAN</descr>
+      <ipaddr>203.0.113.2</ipaddr>
+      <subnet>30</subnet>
+      <gateway>something.co</gateway>
+      <isdhcp>false</isdhcp>
+    </wan>
+    <wan>
+      <if>em5</if>
+      <descr>WAN</descr>
+      <ipaddr>203.0.113.3</ipaddr>
+      <subnet>30</subnet>
+      <gateway>something.co</gateway>
       <isdhcp>false</isdhcp>
     </wan>
   </interfaces>
@@ -38,6 +70,30 @@
       <proto>tcp</proto>
       <src>any</src>
       <dst>203.0.113.1</dst>
+      <dstport>22</dstport>
+    </rule>
+    <rule>
+      <if>LAN</if>
+      <descr>Some other rule</descr>
+      <proto>tcp</proto>
+      <src>any</src>
+      <dst>203.0.113.2</dst>
+      <dstport>22</dstport>
+    </rule>
+    <rule>
+      <if>LAN</if>
+      <descr>Some other rule 2</descr>
+      <proto>tcp</proto>
+      <src>any</src>
+      <dst>203.0.113.3</dst>
+      <dstport>22</dstport>
+    </rule>
+    <rule>
+      <if>WAN</if>
+      <descr>Some other rule 3</descr>
+      <proto>tcp</proto>
+      <src>any</src>
+      <dst>203.0.113.4</dst>
       <dstport>22</dstport>
     </rule>
   </firewall>

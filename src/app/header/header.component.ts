@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import packageJson from '../../../package.json';
 
 @Component({
   selector: 'app-header',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-
+  version = packageJson.version;
 }
