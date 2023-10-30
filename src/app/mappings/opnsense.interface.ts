@@ -9,6 +9,10 @@ export interface Opnsense {
   interfaces?: Interfaces;
   firewall?: Firewall;
   dhcpd?: Dhcpd;
+  dhcpdv6?: DhcpdV6;
+  nat?: any;
+  filter?: any;
+  aliases?: any;
 }
 
 export interface Firewall {
@@ -38,6 +42,9 @@ export interface Source {
 
 export interface Dhcpd {
   dhcpd?: Lan2[];
+}
+export interface DhcpdV6 {
+  dhcpdV6?: Lan2[];
 }
 export interface Interfaces {
   lan?: NetworkController[];

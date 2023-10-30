@@ -3,26 +3,15 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { 
   pfRoot, 
   Rule as pfRule, 
-  NetworkController as pfWan, 
-  NetworkController as pfLan,
-  NetworkController as pfOpt,
-  Lan2 as pfLan2,
 } from '../mappings/pfsense-complex.interface';
 import { 
   opnRoot,
-  Interfaces as opnInterfaces, 
-  Firewall as opnFirewall, 
   Rule as opnRule, 
   Opnsense, 
-  NetworkController as opnWan, 
-  NetworkController as opnLan, 
-  NetworkController as opnOpt, 
   System as opnSystem,
-  Dhcpd as opnDhcpd,
-  Lan2 as opnLan2,
 } from '../mappings/opnsense.interface';
 import { v1 as uuidv1 } from 'uuid'
-const { XMLParser, XMLBuilder } = require('fast-xml-parser');
+import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 
 @Injectable({
   providedIn: 'root'
@@ -54,22 +43,23 @@ export class ConverterService {
       reader.onload = function (event) {
 
         const parser = new XMLParser();
-        const parsedXmlToJson = parser.parse(reader.result);
-        
-        that.conversionAvailable$.next(true);
+        if (reader.result !== null) {
+          const parsedXmlToJson = parser.parse(reader.result.toString());
+          const opnJson = that.mapPFtoOPN(parsedXmlToJson);
+          
+          if (opnJson instanceof Error) {
+            subscriber.next();
+            subscriber.error(opnJson);  // bubble error message up to the calling method
+          }
 
-        const opnJson = that.mapPFtoOPN(parsedXmlToJson);
-        
-        if (opnJson instanceof Error) {
-          subscriber.next();
-          subscriber.error(opnJson);  // bubble error message up to the calling method
+          const opnXml = that.jsonToXML(opnJson as opnRoot);
+          
+          that.conversionAvailable$.next(true);
+          subscriber.next(opnXml);  // opnXml object will be returned to the calling method
+          subscriber.complete();    // Complete the subscriber
+        } else {
+          subscriber.error(new Error('File is empty'));
         }
-        const opnXml = that.jsonToXML(opnJson as opnRoot);
-
-        const prettiedXml = that.formatXml(opnXml);
-        
-        subscriber.next(prettiedXml);  // opnXml object will be returned to the calling method
-        subscriber.complete();    // Complete the subscriber
       };
     })
   }
@@ -79,54 +69,15 @@ export class ConverterService {
     if (input.pfsense == null) return this.throwIncompatibleFileError('pfsense object is null');
     
     const pfSystem = input.pfsense.system;
-    const wans: opnWan[] = [];
-    const lans: opnLan[] = [];
-    const opts: opnOpt[] = [];
     const rules: opnRule[] = [];
-    const dhcpds: opnLan2[] = [];
-
     const system: opnSystem = {
       hostname: '',
       domain: '',
       timezone: '',
       language: ''
     };
-    
-    const pfInterfacesIter = input.pfsense.interfaces;
-    if (pfInterfacesIter) {
 
-      for (const [key, value] of Object.entries(pfInterfacesIter)) {
-        if (key === 'wan') {
-          wans.push({
-            ...value
-          });
-        };
-
-        if (key === 'lan') {
-          lans.push({
-            ...value
-          });
-        }
-
-        if (key.includes('opt')) {
-          // @todo - fix opt numbering
-          opts.push({
-            ...value
-          });
-        }
-      }
-    }
-
-    const pfDhcpdIter = input.pfsense.dhcpd;
-    if (pfDhcpdIter) {
-      for (const [key, value] of Object.entries(pfDhcpdIter)) {
-        // @todo - fix tag naming
-        dhcpds.push({
-          ...value
-        });
-      }
-    }
-
+    // @todo - unsure if custom mapping of rules are needed
     const pfRuleIter = input.pfsense.firewall;
     if (pfRuleIter) {
       for (const [key, value] of Object.entries(pfRuleIter)) {
@@ -177,29 +128,14 @@ export class ConverterService {
       system.timezone = pfSystem.timezone;
     }
 
-    const firewall: opnFirewall = {
-      rules: (rules.length > 0) ? rules : [],
-    };
-
-    const interfaces: opnInterfaces = {
-      wan: (wans.length > 0) ? wans : [],
-      lan: (lans.length > 0) ? lans : [],
-      opt: (opts.length > 0) ? opts : [],
-    };
-
-    const dhcpd: opnDhcpd = {
-      dhcpd: (dhcpds.length > 0) ? dhcpds : [],
-    };
-
+    //@ts-ignore
     const opnsense: Opnsense = {
       version: 1,
       'config-apply': {
         uuid: uuidv1(),
       },
       system,
-      interfaces,
-      dhcpd,
-      firewall,
+      ...input.pfsense,
     }
     
     const opnsenseJson: opnRoot = {
@@ -210,19 +146,12 @@ export class ConverterService {
   }
 
   jsonToXML(opnJson: opnRoot) {
-    const builder = new XMLBuilder();
-    return builder.build(opnJson);
-  }
 
-  formatXml(xml: any, tab?: string) { // tab = optional indent value, default is tab (\t)
-    let formatted = '', indent= '';
-    tab = tab || '\t';
-    xml.split(/>\s*</).forEach(function(node: string) {
-        if (node.match( /^\/\w/ )) indent = indent.substring(tab?.length || 2); // decrease indent by one 'tab'
-        formatted += indent + '<' + node + '>\r\n';
-        if (node.match( /^<?\w[^>]*[^\/]$/ )) indent += tab;              // increase indent
+    const builder = new XMLBuilder({
+      format: true,
+      // oneListGroup:true
     });
-    return formatted.substring(1, formatted.length-3);
+    return builder.build(opnJson);
   }
 
   private throwIncompatibleFileError(message: string): Error {

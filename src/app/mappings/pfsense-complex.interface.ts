@@ -41,7 +41,7 @@ export interface Pfsense {
   dhcrelay?: string;
   crl?: Crl;
   bridges?: Bridges;
-  dhcpdv6?: string;
+  dhcpdv6?: Dhcpd;
   dhcrelay6?: string;
   ntpd?: string;
   firewall: Firewall;
