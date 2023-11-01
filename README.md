@@ -1,6 +1,6 @@
 # pf2open
 
-A simple pfsense to opnsense confing mapper.
+A simple pfsense to opnsense config mapper.
 
 ## Development
 
