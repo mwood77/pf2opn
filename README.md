@@ -2,6 +2,11 @@
 
 A simple pfsense to opnsense config mapper.
 
+Get pf2opn:
+```
+docker run -p 4200:80 -d mwood77/pf2opn
+```
+
 ## Development
 
 ### Prerequisites
