@@ -2,10 +2,16 @@
 
 A simple pfsense to opnsense config mapper.
 
-Get pf2opn:
+### Run it with docker:
 ```
-docker run -p 4200:80 -d mwood77/pf2opn
+docker run --name pf2opn -p 4200:80 -d mwood77/pf2opn
 ```
+
+### Use it on the web:
+- [`https://www.pf2opn.com`](https://www.pf2opn.com)
+
+### Want to contirute?
+- Read the [prerequisites](#prerequisites) and then proceed to [installation & running locally for development](#installation--running-locally-for-development)
 
 ## Development
 

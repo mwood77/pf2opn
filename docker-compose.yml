@@ -1,12 +1,13 @@
 version: '3.9'
 
-# docker|podman run -p 4200:80 -d pf2opn
+# docker|podman run --name pf2opn -p 4200:80 -d pf2opn
 services:
   pf2opn:
+    container_name: pf2opn
+    name: pf2opn
+    image: pf2opn
     build:
       context: .
       dockerfile: Dockerfile
-    image: pf2opn
-    container_name: pf2opn
     ports:
       - '4200:80'
