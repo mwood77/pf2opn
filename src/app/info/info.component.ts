@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
 export class InfoComponent {
 
   showInfoCard = true;
-  showDonations = false;
+  showDonations = true;
 
   kofiURL = 'https://ko-fi.com/mwood77'
   githubURL = 'https://github.com/sponsors/mwood77'
