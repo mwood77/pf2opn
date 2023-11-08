@@ -136,6 +136,23 @@ export interface System {
   domain?: string;
   timezone?: string;
   language?: string;
+  user?: User;
+}
+
+export interface User {
+  [x: string]: any;
+  name?: string;
+  descr?: string;
+  scope?: string;
+  groupname?: string;
+  password?: string;
+  uid?: number;
+  priv?: string;
+  'md5-hash'?: string;
+  expires?: string;
+  authorizedkeys?: string;
+  ipsecpsk?: string;
+  'bcrypt-hash'?: string;
 }
 
 export interface Configapply {

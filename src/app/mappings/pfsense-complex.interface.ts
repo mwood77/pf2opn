@@ -1050,6 +1050,7 @@ export interface User {
   expires?: string;
   authorizedkeys?: string;
   ipsecpsk?: string;
+  'bcrypt-hash'?: string;
 }
 
 export interface Group {
