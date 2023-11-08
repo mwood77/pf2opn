@@ -147,8 +147,6 @@ export class ConverterService {
       delete input.pfsense.system?.user;
     }
 
-    console.log(system)
-
     // @ts-ignore
     const opnsense: Opnsense = {
       version: 1,
