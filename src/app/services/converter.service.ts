@@ -9,6 +9,7 @@ import {
   Rule as opnRule, 
   Opnsense, 
   System as opnSystem,
+  User,
 } from '../mappings/opnsense.interface';
 import { v1 as uuidv1 } from 'uuid'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
@@ -126,16 +127,36 @@ export class ConverterService {
       system.hostname = pfSystem.hostname;
       system.domain = pfSystem.domain;
       system.timezone = pfSystem.timezone;
+
+      system.user = {
+        ...pfSystem.user
+      }
+      
+      // Map bcrypt-hash or md5-hash to password
+      if (pfSystem.user?.['bcrypt-hash']) { 
+        system.user.password = pfSystem.user['bcrypt-hash'];
+        delete system.user['bcrypt-hash'];
+
+      }
+      if (pfSystem.user?.['md5-hash']) {
+        system.user.password = pfSystem.user['md5-hash'];
+        delete system.user['md5-hash'];
+      }
+      
+      // dedupe pfSense.system.user
+      delete input.pfsense.system?.user;
     }
 
-    //@ts-ignore
+    console.log(system)
+
+    // @ts-ignore
     const opnsense: Opnsense = {
       version: 1,
       'config-apply': {
         uuid: uuidv1(),
       },
-      system,
       ...input.pfsense,
+      system,
     }
     
     const opnsenseJson: opnRoot = {
