@@ -43,7 +43,12 @@ export class ConverterService {
      return new Observable((subscriber: any) => {
       reader.onload = function (event) {
 
-        const parser = new XMLParser();
+        // Correctly handle CDATA tags
+        const parserOoptions = {
+          cdataPropName: "CDATA"
+        }
+
+        const parser = new XMLParser(parserOoptions);
         if (reader.result !== null) {
           const parsedXmlToJson = parser.parse(reader.result.toString());
           const opnJson = that.mapPFtoOPN(parsedXmlToJson);
@@ -180,6 +185,9 @@ export class ConverterService {
 
     const builder = new XMLBuilder({
       format: true,
+      // Correctly encode handled CDATA tags
+      cdataPropName: 'CDATA'
+      
       // oneListGroup:true
     });
     return builder.build(opnJson);
