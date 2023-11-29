@@ -1051,6 +1051,7 @@ export interface User {
   authorizedkeys?: string;
   ipsecpsk?: string;
   'bcrypt-hash'?: string;
+  'sha512-hash'?: string;
 }
 
 export interface Group {
