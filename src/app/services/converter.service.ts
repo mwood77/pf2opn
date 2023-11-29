@@ -132,7 +132,7 @@ export class ConverterService {
         ...pfSystem.user
       }
       
-      // Map bcrypt-hash or md5-hash to password
+      // Map bcrypt-hash, md5-hash, sha512-hash tags to password tag
       if (pfSystem.user?.['bcrypt-hash']) { 
         system.user.password = pfSystem.user['bcrypt-hash'];
         delete system.user['bcrypt-hash'];
@@ -141,6 +141,10 @@ export class ConverterService {
       if (pfSystem.user?.['md5-hash']) {
         system.user.password = pfSystem.user['md5-hash'];
         delete system.user['md5-hash'];
+      }
+      if (pfSystem.user?.['sha512-hash']) {
+        system.user.password = pfSystem.user['sha512-hash'];
+        delete system.user['sha512-hash'];
       }
       
       // dedupe pfSense.system.user
