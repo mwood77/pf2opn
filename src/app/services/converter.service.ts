@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { 
-  pfRoot, 
-  Rule as pfRule, 
+import {
+  pfRoot,
+  Rule as pfRule,
+  User as pfUser
 } from '../mappings/pfsense-complex.interface';
-import { 
+import {
   opnRoot,
-  Rule as opnRule, 
-  Opnsense, 
+  Rule as opnRule,
+  Opnsense,
   System as opnSystem,
   User,
 } from '../mappings/opnsense.interface';
@@ -31,7 +32,7 @@ export class ConverterService {
   async convert(file: File) {
     this.displayConversionCard$.next(false);
     this.displayConversionCard$.next(true);
-    
+
     this.conversionAvailable$.next(false);
 
     const reader = new FileReader();
@@ -43,18 +44,23 @@ export class ConverterService {
      return new Observable((subscriber: any) => {
       reader.onload = function (event) {
 
-        const parser = new XMLParser();
+        // Correctly handle CDATA tags
+        const parserOoptions = {
+          cdataPropName: "CDATA"
+        }
+
+        const parser = new XMLParser(parserOoptions);
         if (reader.result !== null) {
           const parsedXmlToJson = parser.parse(reader.result.toString());
           const opnJson = that.mapPFtoOPN(parsedXmlToJson);
-          
+
           if (opnJson instanceof Error) {
             subscriber.next();
             subscriber.error(opnJson);  // bubble error message up to the calling method
           }
 
           const opnXml = that.jsonToXML(opnJson as opnRoot);
-          
+
           that.conversionAvailable$.next(true);
           subscriber.next(opnXml);  // opnXml object will be returned to the calling method
           subscriber.complete();    // Complete the subscriber
@@ -68,7 +74,7 @@ export class ConverterService {
   mapPFtoOPN(input: pfRoot) {
 
     if (input.pfsense == null) return this.throwIncompatibleFileError('pfsense object is null');
-    
+
     const pfSystem = input.pfsense.system;
     const rules: opnRule[] = [];
     const system: opnSystem = {
@@ -127,28 +133,25 @@ export class ConverterService {
       system.hostname = pfSystem.hostname;
       system.domain = pfSystem.domain;
       system.timezone = pfSystem.timezone;
+      let mappedUsers = Array<User>();
 
-      system.user = {
-        ...pfSystem.user
-      }
-      
-      // Map bcrypt-hash, md5-hash, sha512-hash tags to password tag
-      if (pfSystem.user?.['bcrypt-hash']) { 
-        system.user.password = pfSystem.user['bcrypt-hash'];
-        delete system.user['bcrypt-hash'];
+      const deDupeSystem = new Set(Object.values(system))
+      for (const [key, value] of Object.entries(pfSystem)) {
 
+        // Map over user(s)
+        if (key == 'user') {
+          Array.isArray(value) ?
+            value.forEach((u: pfUser) => mappedUsers.push(this.mapUserEntity(u))) :
+            mappedUsers.push(this.mapUserEntity(value));
+        }
+
+        if (!deDupeSystem.has(value)) {
+          system[key] = value;
+        }
       }
-      if (pfSystem.user?.['md5-hash']) {
-        system.user.password = pfSystem.user['md5-hash'];
-        delete system.user['md5-hash'];
-      }
-      if (pfSystem.user?.['sha512-hash']) {
-        system.user.password = pfSystem.user['sha512-hash'];
-        delete system.user['sha512-hash'];
-      }
-      
-      // dedupe pfSense.system.user
-      delete input.pfsense.system?.user;
+
+      // flatten users into distinct <user> elements
+      system.user = mappedUsers.flatMap((u: User) => u);
     }
 
     // @ts-ignore
@@ -160,11 +163,11 @@ export class ConverterService {
       ...input.pfsense,
       system,
     }
-    
+
     const opnsenseJson: opnRoot = {
       opnsense,
     }
-    
+
     return opnsenseJson;
   }
 
@@ -172,6 +175,9 @@ export class ConverterService {
 
     const builder = new XMLBuilder({
       format: true,
+      // Correctly encode handled CDATA tags
+      cdataPropName: 'CDATA'
+
       // oneListGroup:true
     });
     return builder.build(opnJson);
@@ -179,5 +185,29 @@ export class ConverterService {
 
   private throwIncompatibleFileError(message: string): Error {
     return new Error('Incompatible file type\nMessage:  ' + message);
+  }
+
+  private mapUserEntity(u: pfUser): User {
+      let user: User = {
+        password: '',
+        ...u
+      }
+
+      if (u['bcrypt-hash']) {
+        user.password = u['bcrypt-hash'];
+        delete user['bcrypt-hash'];
+      }
+
+      if (u['md5-hash']) {
+        user.password = u['md5-hash'];
+        delete user['md5-hash'];
+      }
+
+      if (u['sha512-hash']) {
+        user.password = u['sha512-hash'];
+        delete user['sha512-hash'];
+      }
+
+      return user;
   }
 }
