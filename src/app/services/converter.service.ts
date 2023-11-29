@@ -149,6 +149,14 @@ export class ConverterService {
       
       // dedupe pfSense.system.user
       delete input.pfsense.system?.user;
+
+      // dedupe pfSense.system against manual opnSense.system mappings
+      const deDupeSystem = new Set(Object.values(system))
+      for (const [key, value] of Object.entries(pfSystem)) {
+        if (!deDupeSystem.has(value)) {
+          system[key] = value;
+        }
+      }
     }
 
     // @ts-ignore

@@ -132,6 +132,7 @@ export interface Staticmap {
 }
 
 export interface System {
+  [x: string]: any;
   hostname?: string;
   domain?: string;
   timezone?: string;
