@@ -138,6 +138,10 @@ export interface System {
   timezone?: string;
   language?: string;
   user?: User;
+  disablenatreflection?: string;
+  disablesegmentationoffloading?: string;
+  disablelargereceiveoffloading?: string;
+  ipv6allow?: string;
 }
 
 export interface User {
