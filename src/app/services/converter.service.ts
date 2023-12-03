@@ -46,7 +46,8 @@ export class ConverterService {
 
         // Correctly handle CDATA tags
         const parserOoptions = {
-          cdataPropName: "CDATA"
+          cdataPropName: "CDATA",
+          leadingZeros: true,
         }
 
         const parser = new XMLParser(parserOoptions);
@@ -157,9 +158,6 @@ export class ConverterService {
     // @ts-ignore
     const opnsense: Opnsense = {
       version: 1,
-      'config-apply': {
-        uuid: uuidv1(),
-      },
       ...input.pfsense,
       system,
     }
