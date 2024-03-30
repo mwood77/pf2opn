@@ -3,13 +3,15 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import {
   pfRoot,
   Rule as pfRule,
-  User as pfUser
+  User as pfUser,
+  Alias as pfAlias,
 } from '../mappings/pfsense-complex.interface';
 import {
   opnRoot,
   Rule as opnRule,
   Opnsense,
   System as opnSystem,
+  Alias as opnAlias,
   User,
 } from '../mappings/opnsense.interface';
 import { v1 as uuidv1 } from 'uuid'
@@ -78,6 +80,7 @@ export class ConverterService {
 
     const pfSystem = input.pfsense.system;
     const rules: opnRule[] = [];
+    const aliases: opnAlias[] = [];
     const system: opnSystem = {
       hostname: '',
       domain: '',
@@ -130,6 +133,37 @@ export class ConverterService {
       }
     }
 
+    const pfAliases = input.pfsense.aliases;
+    if (pfAliases) {
+      for (const [key, value] of Object.entries(pfAliases)) {
+        if (key === 'alias') {
+          if (value instanceof Array) {
+            value.forEach((alias: pfAlias) => {
+
+              const modifiedAddress = 
+                alias?.address != undefined 
+                ? alias?.address.replaceAll(' ', '\n') 
+                : '';
+
+              aliases.push({
+                enabled: alias.enabled,
+                name: alias.name,
+                type: alias.type,
+                proto: alias.proto,
+                interface: alias.interface,
+                counters: alias.counters,
+                updatefreq: alias.updatefreq,
+                content: modifiedAddress,
+                categories: alias.categories,
+                description: alias.descr,
+                detail: alias.detail,
+              });
+            });
+          }
+        }
+      };
+    }
+
     if (pfSystem) {
       system.hostname = pfSystem.hostname;
       system.domain = pfSystem.domain;
@@ -160,6 +194,7 @@ export class ConverterService {
       version: 1,
       ...input.pfsense,
       system,
+      aliases
     }
 
     const opnsenseJson: opnRoot = {

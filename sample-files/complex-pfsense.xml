@@ -1183,6 +1183,19 @@
 			<address>159.224.66.161/32</address>
 			<detail><![CDATA[Entry added Thu, 02 Feb 2012 22:52:11 +0000||]]></detail>
 		</alias>
+		<alias uuid="72b6208b-e50d-4d68-a594-da0fa6760000">
+            <enabled>1</enabled>
+            <name>MY_HOST</name>
+            <type>host</type>
+            <proto/>
+            <interface/>
+            <counters>0</counters>
+            <updatefreq/>
+            <content>192.168.1.1 192.168.1.4 192.168.34.34</content>
+            <categories/>
+            <description>Entry added Mon, 01 Jan 1979 01:23:45 -0000</description>
+			<farts>1</farts>
+		</alias>
 	</aliases>
 	<proxyarp></proxyarp>
 	<cron>
