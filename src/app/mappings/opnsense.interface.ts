@@ -12,21 +12,22 @@ export interface Opnsense {
   dhcpdv6?: DhcpdV6;
   nat?: any;
   filter?: any;
-  aliases?: Alias[];
+  aliases?: any;
 }
 
 export interface Alias {
-  enabled?: string;
-  name?: string;
-  type?: string;
-  proto?: any;
-  interface?: any,
-  counters?: number | string;
-  updatefreq?: any;
-  content?: string;
-  categories?: any
-  description?: string;
-  detail?: string;
+    [x: string]: any;
+    enabled?: string;
+    name?: string;
+    type?: string;
+    proto?: any;
+    interface?: any,
+    counters?: number | string;
+    updatefreq?: any;
+    content?: string;
+    categories?: any
+    description?: string;
+    detail?: string;
 }
 
 export interface Firewall {

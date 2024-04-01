@@ -16,6 +16,7 @@ import {
 } from '../mappings/opnsense.interface';
 import { v1 as uuidv1 } from 'uuid'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
+import xmlFormat from 'xml-formatter';
 
 @Injectable({
   providedIn: 'root'
@@ -80,7 +81,7 @@ export class ConverterService {
 
     const pfSystem = input.pfsense.system;
     const rules: opnRule[] = [];
-    const aliases: opnAlias[] = [];
+    let aliases = undefined;
     const system: opnSystem = {
       hostname: '',
       domain: '',
@@ -135,33 +136,17 @@ export class ConverterService {
 
     const pfAliases = input.pfsense.aliases;
     if (pfAliases) {
+      let mappedAlias = Array<opnAlias>();
+
       for (const [key, value] of Object.entries(pfAliases)) {
         if (key === 'alias') {
-          if (value instanceof Array) {
-            value.forEach((alias: pfAlias) => {
-
-              const modifiedAddress = 
-                alias?.address != undefined 
-                ? alias?.address.replaceAll(' ', '\n') 
-                : '';
-
-              aliases.push({
-                enabled: alias.enabled,
-                name: alias.name,
-                type: alias.type,
-                proto: alias.proto,
-                interface: alias.interface,
-                counters: alias.counters,
-                updatefreq: alias.updatefreq,
-                content: modifiedAddress,
-                categories: alias.categories,
-                description: alias.descr,
-                detail: alias.detail,
-              });
-            });
-          }
+          value.forEach((alias: pfAlias) => {
+            mappedAlias.push(this.mapAliasEntity(alias));
+          });
         }
       };
+
+      aliases = mappedAlias
     }
 
     if (pfSystem) {
@@ -204,16 +189,40 @@ export class ConverterService {
     return opnsenseJson;
   }
 
+  jsonToXmlCustomArray(array: Array<any>, nodeName: string) {
+    const arrayBuilder = new XMLBuilder({
+      format: true,
+      arrayNodeName: nodeName,
+    });
+
+    return arrayBuilder.build(array);
+  }
+
   jsonToXML(opnJson: opnRoot) {
 
     const builder = new XMLBuilder({
       format: true,
       // Correctly encode handled CDATA tags
-      cdataPropName: 'CDATA'
-
-      // oneListGroup:true
+      cdataPropName: 'CDATA',
     });
-    return builder.build(opnJson);
+
+    // This is a terrible hack because fast-xml-parser doesn't respect arrays...or I cannot
+    // figure out how to make it respect them properly without destroying the entire XML response...
+    if (opnJson.opnsense?.aliases) {
+      const additionalArrays = this.jsonToXmlCustomArray(opnJson.opnsense.aliases, 'alias');
+
+      delete opnJson.opnsense.aliases;
+      const result = builder.build(opnJson);
+
+      const split = result.toString().split("</system>");
+      const splitWithAliases = [split[0], `<aliases>${additionalArrays}</aliases>`, split[1]];
+      const concatenatedResult = splitWithAliases.join('');
+
+      return xmlFormat(concatenatedResult);
+    }
+
+    const result = builder.build(opnJson);
+    return result;
   }
 
   private throwIncompatibleFileError(message: string): Error {
@@ -242,5 +251,28 @@ export class ConverterService {
       }
 
       return user;
+  }
+
+  private mapAliasEntity(a: pfAlias) {
+    const modifiedAddress =
+      a?.address != undefined
+      ? a?.address.replaceAll(' ', '\n')
+      : '';
+
+    const aElement = {
+        enabled: a.enabled,
+        name: a.name,
+        type: a.type,
+        proto: a.proto,
+        interface: a.interface,
+        counters: a.counters,
+        updatefreq: a.updatefreq,
+        content: modifiedAddress,
+        categories: a.categories,
+        description: a.descr,
+        detail: a.detail
+    }
+
+      return aElement;
   }
 }
