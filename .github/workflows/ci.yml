@@ -1,8 +1,9 @@
-name: cc
+name: ci
 
 on:
-  workflow_dispatch:
   pull_request:
+  workflow_dispatch:
+
 
 jobs:
   build:
