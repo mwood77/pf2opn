@@ -673,8 +673,14 @@ export interface Aliases {
 }
 
 export interface Alias {
+  enabled?: string;
   name?: string;
   type?: string;
+  proto?: any;
+  interface?: any,
+  counters?: number | string;
+  updatefreq?: any;
+  categories?: any
   descr?: string;
   address?: string;
   detail?: string;

@@ -15,6 +15,21 @@ export interface Opnsense {
   aliases?: any;
 }
 
+export interface Alias {
+    [x: string]: any;
+    enabled?: string;
+    name?: string;
+    type?: string;
+    proto?: any;
+    interface?: any,
+    counters?: number | string;
+    updatefreq?: any;
+    content?: string;
+    categories?: any
+    description?: string;
+    detail?: string;
+}
+
 export interface Firewall {
   rules?: Rule[];
 }

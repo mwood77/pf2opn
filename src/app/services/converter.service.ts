@@ -3,17 +3,20 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import {
   pfRoot,
   Rule as pfRule,
-  User as pfUser
+  User as pfUser,
+  Alias as pfAlias,
 } from '../mappings/pfsense-complex.interface';
 import {
   opnRoot,
   Rule as opnRule,
   Opnsense,
   System as opnSystem,
+  Alias as opnAlias,
   User,
 } from '../mappings/opnsense.interface';
 import { v1 as uuidv1 } from 'uuid'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
+import xmlFormat from 'xml-formatter';
 
 @Injectable({
   providedIn: 'root'
@@ -78,6 +81,7 @@ export class ConverterService {
 
     const pfSystem = input.pfsense.system;
     const rules: opnRule[] = [];
+    let aliases = undefined;
     const system: opnSystem = {
       hostname: '',
       domain: '',
@@ -130,6 +134,21 @@ export class ConverterService {
       }
     }
 
+    const pfAliases = input.pfsense.aliases;
+    if (pfAliases) {
+      let mappedAlias = Array<opnAlias>();
+
+      for (const [key, value] of Object.entries(pfAliases)) {
+        if (key === 'alias') {
+          value.forEach((alias: pfAlias) => {
+            mappedAlias.push(this.mapAliasEntity(alias));
+          });
+        }
+      };
+
+      aliases = mappedAlias
+    }
+
     if (pfSystem) {
       system.hostname = pfSystem.hostname;
       system.domain = pfSystem.domain;
@@ -160,6 +179,7 @@ export class ConverterService {
       version: 1,
       ...input.pfsense,
       system,
+      aliases
     }
 
     const opnsenseJson: opnRoot = {
@@ -169,16 +189,40 @@ export class ConverterService {
     return opnsenseJson;
   }
 
+  jsonToXmlCustomArray(array: Array<any>, nodeName: string) {
+    const arrayBuilder = new XMLBuilder({
+      format: true,
+      arrayNodeName: nodeName,
+    });
+
+    return arrayBuilder.build(array);
+  }
+
   jsonToXML(opnJson: opnRoot) {
 
     const builder = new XMLBuilder({
       format: true,
       // Correctly encode handled CDATA tags
-      cdataPropName: 'CDATA'
-
-      // oneListGroup:true
+      cdataPropName: 'CDATA',
     });
-    return builder.build(opnJson);
+
+    // This is a terrible hack because fast-xml-parser doesn't respect arrays...or I cannot
+    // figure out how to make it respect them properly without destroying the entire XML response...
+    if (opnJson.opnsense?.aliases) {
+      const additionalArrays = this.jsonToXmlCustomArray(opnJson.opnsense.aliases, 'alias');
+
+      delete opnJson.opnsense.aliases;
+      const result = builder.build(opnJson);
+
+      const split = result.toString().split("</system>");
+      const splitWithAliases = [split[0], `<aliases>${additionalArrays}</aliases>`, split[1]];
+      const concatenatedResult = splitWithAliases.join('');
+
+      return xmlFormat(concatenatedResult);
+    }
+
+    const result = builder.build(opnJson);
+    return result;
   }
 
   private throwIncompatibleFileError(message: string): Error {
@@ -207,5 +251,28 @@ export class ConverterService {
       }
 
       return user;
+  }
+
+  private mapAliasEntity(a: pfAlias) {
+    const modifiedAddress =
+      a?.address != undefined
+      ? a?.address.replaceAll(' ', '\n')
+      : '';
+
+    const aElement = {
+        enabled: a.enabled,
+        name: a.name,
+        type: a.type,
+        proto: a.proto,
+        interface: a.interface,
+        counters: a.counters,
+        updatefreq: a.updatefreq,
+        content: modifiedAddress,
+        categories: a.categories,
+        description: a.descr,
+        detail: a.detail
+    }
+
+      return aElement;
   }
 }
