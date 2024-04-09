@@ -4,7 +4,7 @@ A simple pfsense to opnsense config mapper.
 
 ### Run it with docker:
 ```
-docker run --name pf2opn -p 4200:80 -d mwood77/pf2opn
+docker run --name pf2opn -p 4200:80 -d mwood77/pf2opn:latest
 ```
 
 ### Use it on the web:
