@@ -32,7 +32,7 @@ export class ConverterService {
     this.displayConversionCard$.next(false);
   }
 
-  async convert(file: File) {
+  async convert(file: File, pretty?: boolean) {
     this.displayConversionCard$.next(false);
     this.displayConversionCard$.next(true);
 
@@ -49,8 +49,7 @@ export class ConverterService {
 
         // Correctly handle CDATA tags
         const parserOoptions = {
-          cdataPropName: "CDATA",
-          leadingZeros: true,
+          numberParseOptions: {hex: false, leadingZeros: true}
         }
 
         const parser = new XMLParser(parserOoptions);
@@ -63,7 +62,7 @@ export class ConverterService {
             subscriber.error(opnJson);  // bubble error message up to the calling method
           }
 
-          const opnXml = that.jsonToXML(opnJson as opnRoot);
+          const opnXml = that.jsonToXML(opnJson as opnRoot, pretty);
 
           that.conversionAvailable$.next(true);
           subscriber.next(opnXml);  // opnXml object will be returned to the calling method
@@ -139,10 +138,13 @@ export class ConverterService {
       let mappedAlias = Array<opnAlias>();
 
       for (const [key, value] of Object.entries(pfAliases)) {
-        if (key === 'alias') {
+        if (key === 'alias' && value instanceof Array) {
           value.forEach((alias: pfAlias) => {
             mappedAlias.push(this.mapAliasEntity(alias));
           });
+        }
+        if (key === 'alias' && !(value instanceof Array)) {
+          mappedAlias.push(this.mapAliasEntity(value));
         }
       };
 
@@ -198,10 +200,14 @@ export class ConverterService {
     return arrayBuilder.build(array);
   }
 
-  jsonToXML(opnJson: opnRoot) {
+  jsonToXML(opnJson: opnRoot, pretty?: boolean) {
+
+    const shouldPretty = 
+      pretty != undefined ? 
+        pretty : true;
 
     const builder = new XMLBuilder({
-      format: true,
+      format: shouldPretty,
       // Correctly encode handled CDATA tags
       cdataPropName: 'CDATA',
     });
@@ -215,10 +221,13 @@ export class ConverterService {
       const result = builder.build(opnJson);
 
       const split = result.toString().split("</system>");
-      const splitWithAliases = [split[0], `<aliases>${additionalArrays}</aliases>`, split[1]];
+      const splitWithAliases = [split[0]+'</system>', `<aliases>${additionalArrays}</aliases>`, split[1]];
       const concatenatedResult = splitWithAliases.join('');
 
-      return xmlFormat(concatenatedResult);
+      if (shouldPretty) {
+        return xmlFormat(concatenatedResult, {});
+      }
+      return concatenatedResult.replaceAll('\n', '');
     }
 
     const result = builder.build(opnJson);

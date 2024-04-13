@@ -78,9 +78,20 @@
             <!-- Everything worked out! -->
             <div *ngIf="this.conversionAvailable && !this.conversionError">
                 <div class="center">
-
+                    <div class="spacer"></div>
                     <button mat-stroked-button color="accent" class="convert-button" (click)="download()">
-                        <div class="convert-button-text">Download Generated Config</div>
+                        <div class="convert-button-text">Download generated config</div>
+                    </button>
+                </div>
+
+                <div class="spacer"></div>
+                
+                <div class="center">
+                    <p class="text">Having trouble with whitespace during import?</p>
+                </div>
+                <div class="center">
+                    <button mat-stroked-button class="convert-button" (click)="downloadNoPretty()">
+                        <div class="convert-button-text">Download generated config without formatting</div>
                     </button>
                 </div>
 
