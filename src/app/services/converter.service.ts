@@ -49,8 +49,7 @@ export class ConverterService {
 
         // Correctly handle CDATA tags
         const parserOoptions = {
-          cdataPropName: "CDATA",
-          leadingZeros: true,
+          numberParseOptions: {hex: false, leadingZeros: true}
         }
 
         const parser = new XMLParser(parserOoptions);
@@ -139,10 +138,13 @@ export class ConverterService {
       let mappedAlias = Array<opnAlias>();
 
       for (const [key, value] of Object.entries(pfAliases)) {
-        if (key === 'alias') {
+        if (key === 'alias' && value instanceof Array) {
           value.forEach((alias: pfAlias) => {
             mappedAlias.push(this.mapAliasEntity(alias));
           });
+        }
+        if (key === 'alias' && !(value instanceof Array)) {
+          mappedAlias.push(this.mapAliasEntity(value));
         }
       };
 
