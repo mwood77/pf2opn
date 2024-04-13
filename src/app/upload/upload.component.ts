@@ -18,6 +18,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   fileName = '';
   unsupportedFile = false;
   renderedXML: any = null;
+  renderedNotPrettyXML: any = null;
   conversionError = false;
 
   constructor(private converterService: ConverterService) {
@@ -58,6 +59,19 @@ export class UploadComponent implements OnInit, OnDestroy {
     document.body.removeChild(element);
   }
 
+  downloadNoPretty() {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.renderedNotPrettyXML));
+    element.setAttribute('download', 'unformatted-pf2opn-generated-opnsense-config.xml');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  }
+
   async onFileSelected(event: any) {
     const file: File = event.target.files[0];
     this.fileName = file.name;
@@ -75,6 +89,20 @@ export class UploadComponent implements OnInit, OnDestroy {
         },
         err => {
           this.renderedXML = err;
+          console.error('something went boom: ' + err);
+          this.conversionError = true
+          this.progressColor = 'warn';
+        },
+      );
+      (await this.converterService.convert(file, false)).subscribe(
+        res => {
+          this.progressMode = 'determinate';
+          this.incrementProgress();
+          this.renderedNotPrettyXML = res;
+          this.conversionError = false
+        },
+        err => {
+          this.renderedNotPrettyXML = err;
           console.error('something went boom: ' + err);
           this.conversionError = true
           this.progressColor = 'warn';
