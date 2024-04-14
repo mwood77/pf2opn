@@ -28,6 +28,7 @@ export interface Alias {
     categories?: any
     description?: string;
     detail?: string;
+    port?: string;
 }
 
 export interface Firewall {

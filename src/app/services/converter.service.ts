@@ -133,7 +133,7 @@ export class ConverterService {
       }
     }
 
-    const pfAliases = input.pfsense.aliases;
+    const pfAliases = input?.pfsense?.aliases;
     if (pfAliases) {
       let mappedAlias = Array<opnAlias>();
 
@@ -263,10 +263,20 @@ export class ConverterService {
   }
 
   private mapAliasEntity(a: pfAlias) {
-    const modifiedAddress =
-      a?.address != undefined
-      ? a?.address.replaceAll(' ', '\n')
-      : '';
+    let modifiedAddress = '';
+    let modifiedPort = '';
+
+      if (a?.address != undefined && typeof a?.address != 'object') {
+        modifiedAddress = a?.address.replaceAll(' ', '\n');
+      } else {
+        modifiedAddress = a?.address || '';
+      }
+
+      if (a?.port != undefined && typeof a?.port != 'object') {
+        modifiedPort = a?.port.replaceAll(' ', '\n');
+      } else {
+        modifiedPort = a?.port || '';
+      }
 
     const aElement = {
         enabled: a.enabled,
@@ -279,7 +289,8 @@ export class ConverterService {
         content: modifiedAddress,
         categories: a.categories,
         description: a.descr,
-        detail: a.detail
+        detail: a.detail,
+        port: modifiedPort,
     }
 
       return aElement;

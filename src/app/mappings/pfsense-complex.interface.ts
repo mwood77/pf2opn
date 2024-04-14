@@ -684,6 +684,7 @@ export interface Alias {
   descr?: string;
   address?: string;
   detail?: string;
+  port?: string;
 }
 
 export interface Ipsec {
