@@ -265,7 +265,7 @@ export class ConverterService {
   private mapAliasEntity(a: pfAlias) {
     const modifiedAddress =
       a?.address != undefined
-      ? a?.address.replaceAll(' ', '\n')
+      ? a?.address.toString().replaceAll(' ', '\n')
       : '';
 
     const aElement = {
